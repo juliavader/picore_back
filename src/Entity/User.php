@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
  * User
@@ -68,8 +69,9 @@ class User implements UserInterface
 
     /**
      * @var \Doctrine\Common\Collections\Collection
+     * @MaxDepth(1)
      *
-     * @ORM\ManyToMany(targetEntity="Idea", inversedBy="user")
+     * @ORM\ManyToMany(targetEntity="Idea", inversedBy="users")
      * @ORM\JoinTable(name="favorites",
      *   joinColumns={
      *     @ORM\JoinColumn(name="user_id", referencedColumnName="id")
@@ -79,7 +81,14 @@ class User implements UserInterface
      *   }
      * )
      */
-    private $idea;
+    private $favoriteIdeas;
+
+    /**
+     * @MaxDepth(1)
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Idea", mappedBy="user")
+     */
+    private $ideas;
 
     /**
      * Constructor
@@ -87,7 +96,8 @@ class User implements UserInterface
     public function __construct()
     {
         $this->badges = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->idea = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->favoriteIdeas = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->ideas = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -186,31 +196,31 @@ class User implements UserInterface
 //        return $this;
 //    }
 
-//    /**
-//     * @return Collection|Idea[]
-//     */
-//    public function getIdea(): Collection
-//    {
-//        return $this->idea;
-//    }
-//
-//    public function addIdea(Idea $idea): self
-//    {
-//        if (!$this->idea->contains($idea)) {
-//            $this->idea[] = $idea;
-//        }
-//
-//        return $this;
-//    }
-//
-//    public function removeIdea(Idea $idea): self
-//    {
-//        if ($this->idea->contains($idea)) {
-//            $this->idea->removeElement($idea);
-//        }
-//
-//        return $this;
-//    }
+    /**
+     * @return Collection|Idea[]
+     */
+    public function getFavoriteIdeas(): Collection
+    {
+        return $this->favoriteIdeas;
+    }
+
+    public function addFavoriteIdea(Idea $idea): self
+    {
+        if (!$this->favoriteIdeas->contains($idea)) {
+            $this->favoriteIdeas[] = $idea;
+        }
+
+        return $this;
+    }
+
+    public function removeFavoriteIdea(Idea $idea): self
+    {
+        if ($this->favoriteIdeas->contains($idea)) {
+            $this->favoriteIdeas->removeElement($idea);
+        }
+
+        return $this;
+    }
 
     /**
      * Returns the roles granted to the user.
@@ -253,6 +263,7 @@ class User implements UserInterface
         return $this->getName();
     }
 
+
     /**
      * Removes sensitive data from the user.
      *
@@ -262,5 +273,36 @@ class User implements UserInterface
     public function eraseCredentials()
     {
         // TODO: Implement eraseCredentials() method.
+    }
+
+    /**
+     * @return Collection|Idea[]
+     */
+    public function getIdeas(): Collection
+    {
+        return $this->ideas;
+    }
+
+    public function addIdea(Idea $idea): self
+    {
+        if (!$this->ideas->contains($idea)) {
+            $this->ideas[] = $idea;
+            $idea->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIdea(Idea $idea): self
+    {
+        if ($this->ideas->contains($idea)) {
+            $this->ideas->removeElement($idea);
+            // set the owning side to null (unless already changed)
+            if ($idea->getUser() === $this) {
+                $idea->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

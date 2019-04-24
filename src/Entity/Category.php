@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
  * Category
@@ -31,7 +32,8 @@ class Category
     private $name;
 
     /**
-     * @var \Category
+     * @var Category
+     * @MaxDepth(1)
      *
      * @ORM\ManyToOne(targetEntity="Category")
      * @ORM\JoinColumns({
@@ -42,17 +44,18 @@ class Category
 
     /**
      * @var \Doctrine\Common\Collections\Collection
+     * @MaxDepth(1)
      *
-     * @ORM\ManyToMany(targetEntity="Idea", mappedBy="category")
+     * @ORM\ManyToMany(targetEntity="Idea", mappedBy="categories")
      */
-    private $idea;
+    private $ideas;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->idea = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->ideas = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     public function getId(): ?int
@@ -83,33 +86,33 @@ class Category
 
         return $this;
     }
-//
-//    /**
-//     * @return Collection|Idea[]
-//     */
-//    public function getIdea(): Collection
-//    {
-//        return $this->idea;
-//    }
-//
-//    public function addIdea(Idea $idea): self
-//    {
-//        if (!$this->idea->contains($idea)) {
-//            $this->idea[] = $idea;
-//            $idea->addCategory($this);
-//        }
-//
-//        return $this;
-//    }
-//
-//    public function removeIdea(Idea $idea): self
-//    {
-//        if ($this->idea->contains($idea)) {
-//            $this->idea->removeElement($idea);
-//            $idea->removeCategory($this);
-//        }
-//
-//        return $this;
-//    }
+
+    /**
+     * @return Collection|Idea[]
+     */
+    public function getIdeas(): Collection
+    {
+        return $this->ideas;
+    }
+
+    public function addIdea(Idea $idea): self
+    {
+        if (!$this->ideas->contains($idea)) {
+            $this->ideas[] = $idea;
+            $idea->addCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIdea(Idea $idea): self
+    {
+        if ($this->ideas->contains($idea)) {
+            $this->ideas->removeElement($idea);
+            $idea->removeCategory($this);
+        }
+
+        return $this;
+    }
 
 }

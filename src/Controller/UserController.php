@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use App\Controller\BaseController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
@@ -14,6 +15,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
  */
 class UserController extends BaseController
 {
+
     /**
      * @Route("/users", name="users-list", methods="GET")
      */
@@ -21,10 +23,7 @@ class UserController extends BaseController
     {
 
         $users = $this->getDoctrine()->getRepository(User::class)
-            ->createQueryBuilder('u')
-            ->getQuery()
-            ->getArrayResult();
-
+            ->findAll();
 
         return $this->json($users);
 

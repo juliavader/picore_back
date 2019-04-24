@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
  * Idea
@@ -46,15 +47,17 @@ class Idea
 
     /**
      * @var \Doctrine\Common\Collections\Collection
+     * @MaxDepth(1)
      *
-     * @ORM\ManyToMany(targetEntity="User", mappedBy="idea")
+     * @ORM\ManyToMany(targetEntity="User", mappedBy="favoriteIdeas")
      */
-    private $user;
+    private $users;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
+     * @MaxDepth(1)
      *
-     * @ORM\ManyToMany(targetEntity="Category", inversedBy="idea")
+     * @ORM\ManyToMany(targetEntity="Category", inversedBy="ideas")
      * @ORM\JoinTable(name="idea_has_category",
      *   joinColumns={
      *     @ORM\JoinColumn(name="idea_id", referencedColumnName="id")
@@ -64,14 +67,22 @@ class Idea
      *   }
      * )
      */
-    private $category;
+    private $categories;
+
+    /**
+     * @MaxDepth(1)
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="ideas")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $user;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->user = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->users = new \Doctrine\Common\Collections\ArrayCollection();
         $this->category = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
@@ -119,43 +130,43 @@ class Idea
 //    /**
 //     * @return Collection|User[]
 //     */
-//    public function getUser(): Collection
+//    public function getUsers(): Collection
 //    {
-//        return $this->user;
-//    }
-//
-//    public function addUser(User $user): self
-//    {
-//        if (!$this->user->contains($user)) {
-//            $this->user[] = $user;
-//            $user->addIdea($this);
-//        }
-//
-//        return $this;
-//    }
-//
-//    public function removeUser(User $user): self
-//    {
-//        if ($this->user->contains($user)) {
-//            $this->user->removeElement($user);
-//            $user->removeIdea($this);
-//        }
-//
-//        return $this;
+//        return $this->users;
 //    }
 
-    /**
-     * @return Collection|Category[]
-     */
-    public function getCategory(): Collection
+    public function addUser(User $user): self
     {
-        return $this->category;
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->addIdea($this);
+        }
+
+        return $this;
     }
+
+    public function removeUser(User $user): self
+    {
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
+            $user->removeIdea($this);
+        }
+
+        return $this;
+    }
+
+//    /**
+//     * @return Collection|Category[]
+//     */
+//    public function getCategories(): Collection
+//    {
+//        return $this->categories;
+//    }
 
     public function addCategory(Category $category): self
     {
-        if (!$this->category->contains($category)) {
-            $this->category[] = $category;
+        if (!$this->categories->contains($category)) {
+            $this->categories[] = $category;
         }
 
         return $this;
@@ -163,9 +174,21 @@ class Idea
 
     public function removeCategory(Category $category): self
     {
-        if ($this->category->contains($category)) {
-            $this->category->removeElement($category);
+        if ($this->categories->contains($category)) {
+            $this->categories->removeElement($category);
         }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }
