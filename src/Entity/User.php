@@ -199,6 +199,8 @@ class User implements UserInterface
     /**
      * @return Collection|Idea[]
      */
+
+
     public function getFavoriteIdeas(): Collection
     {
         return $this->favoriteIdeas;

@@ -24,9 +24,9 @@ class AuthController extends BaseController
     {
         $em = $this->getDoctrine()->getManager();
 
-        $username = $request->request->get('_username');
-        $password = $request->request->get('_password');
-        $email = $request->request->get('_email');
+        $username = $request->request->get('username');
+        $password = $request->request->get('password');
+        $email = $request->request->get('email');
 
         $user = new User();
         $user-> setName($username);
@@ -37,7 +37,7 @@ class AuthController extends BaseController
         $em->persist($user);
         $em->flush();
 
-        return new Response(sprintf('User %s successfully created', $user->getUsername()));
+        return $this->json($user);
     }
 
     public function api()

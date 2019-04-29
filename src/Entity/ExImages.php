@@ -29,12 +29,8 @@ class ExImages
     private $name;
 
     /**
-     * @var \Idea
-     *
-     * @ORM\ManyToOne(targetEntity="Idea")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="idea_id", referencedColumnName="id")
-     * })
+     * @ORM\ManyToOne(targetEntity="App\Entity\Idea", inversedBy="exImages")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $idea;
 
@@ -66,6 +62,5 @@ class ExImages
 
         return $this;
     }
-
 
 }

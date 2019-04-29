@@ -29,12 +29,8 @@ class ExUrl
     private $name;
 
     /**
-     * @var \Idea
-     *
-     * @ORM\ManyToOne(targetEntity="Idea")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="idea_id", referencedColumnName="id")
-     * })
+     * @ORM\ManyToOne(targetEntity="App\Entity\Idea", inversedBy="exUrls")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $idea;
 
@@ -66,6 +62,5 @@ class ExUrl
 
         return $this;
     }
-
 
 }

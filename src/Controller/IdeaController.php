@@ -4,12 +4,41 @@ namespace App\Controller;
 
 use App\Entity\Category;
 use App\Entity\Idea;
-use  App\Controller\BaseController;
+use App\Entity\User;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class IdeaController extends BaseController
 {
+
+    /**
+     * @Route("/newIdea", name="new_idea", methods="POST" )
+     * @return Response
+     */
+
+    public function newIdea(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $title = $request->request->get('title');
+        $description = $request->request->get('description');
+        $categoryId = $request->request->get('category');
+        $category = $em->getRepository(Category::class)->find($categoryId);
+//        $user = $request->request->get('user');
+
+        $newidea = new Idea();
+        $newidea-> setName($title);
+        $newidea->setDescription($description);
+//        $newidea->setUser($user);
+        $newidea->setDateCreation(new \DateTime());
+        $em->persist($newidea);
+        $em->flush();
+
+        return $this->json($newidea);
+    }
+
+
     /**
      * @Route("/countAllIdeas", name="countAllIdeas", methods="GET")
      */
@@ -33,7 +62,7 @@ class IdeaController extends BaseController
         $idea = $this->getDoctrine()->getRepository(Idea::class)
             ->findOneBy([ 'id' => RAND(1, $this->Counting()) ]);
 
-        return $this->json($idea);
+        return $this->serializeEntity($idea);
     }
 
 
@@ -72,7 +101,7 @@ class IdeaController extends BaseController
     {
         $specIdea = $this->getDoctrine()->getRepository(Idea::class)
             ->createQueryBuilder('i')
-            ->select('i ,c')
+            ->select('i,c')
             ->join('i.categories', 'c')
             ->where('c.id = :categoryId')
             ->orwhere('c.id = :subCategoryId')
@@ -84,26 +113,31 @@ class IdeaController extends BaseController
         return $this->json($specIdea);
     }
 
+
     /**
-     * @Route("/subcategory/{categoryId}", name="getSubcategorybyCategory", methods="GET")
-     * @param $categoryId
+     * @Route("/addFavorite", name="favorite", methods="POST" )
      * @return Response
      */
 
+    public function AddFavorite(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
 
-    public function getAllSubcategorybyCategory($categoryId){
+        $ideaId = $request->request->get('idea');
+        $idea = $em->getRepository(Idea::class)->find($ideaId);
+        $userid = $request->request->get('user');
+        $user = $em->getRepository(User::class)->find($userid);
 
-        $subcategory = $this->getDoctrine()->getRepository(Category::class)
-            ->createQueryBuilder('c')
-            ->select('c')
-            ->where('c.category = :categoryId')
-            ->setParameter('categoryId', $categoryId)
-            ->getQuery()
-            ->getArrayResult();
 
-        return $this->json($subcategory);
+        $addFavorite = $user->addFavoriteIdea($idea);
+        $em->persist($addFavorite);
+        $em->flush();
+
+        return $this->serializeEntity($addFavorite);
     }
 
 
 
- }
+
+
+}

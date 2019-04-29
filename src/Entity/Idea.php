@@ -78,12 +78,30 @@ class Idea
     private $user;
 
     /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ExCompany", mappedBy="idea", orphanRemoval=true)
+     */
+    private $exCompanies;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ExImages", mappedBy="idea", orphanRemoval=true)
+     */
+    private $exImages;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ExUrl", mappedBy="idea", orphanRemoval=true)
+     */
+    private $exUrls;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->users = new \Doctrine\Common\Collections\ArrayCollection();
         $this->category = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->exCompanies = new ArrayCollection();
+        $this->exImages = new ArrayCollection();
+        $this->exUrls = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -127,13 +145,13 @@ class Idea
         return $this;
     }
 
-//    /**
-//     * @return Collection|User[]
-//     */
-//    public function getUsers(): Collection
-//    {
-//        return $this->users;
-//    }
+    /**
+     * @return Collection|User[]
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
 
     public function addUser(User $user): self
     {
@@ -155,13 +173,13 @@ class Idea
         return $this;
     }
 
-//    /**
-//     * @return Collection|Category[]
-//     */
-//    public function getCategories(): Collection
-//    {
-//        return $this->categories;
-//    }
+    /**
+     * @return Collection|Category[]
+     */
+    public function getCategories(): Collection
+    {
+        return $this->categories;
+    }
 
     public function addCategory(Category $category): self
     {
@@ -189,6 +207,99 @@ class Idea
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ExCompany[]
+     */
+    public function getExCompanies(): Collection
+    {
+        return $this->exCompanies;
+    }
+
+    public function addExCompany(ExCompany $exCompany): self
+    {
+        if (!$this->exCompanies->contains($exCompany)) {
+            $this->exCompanies[] = $exCompany;
+            $exCompany->setIdea($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExCompany(ExCompany $exCompany): self
+    {
+        if ($this->exCompanies->contains($exCompany)) {
+            $this->exCompanies->removeElement($exCompany);
+            // set the owning side to null (unless already changed)
+            if ($exCompany->getIdea() === $this) {
+                $exCompany->setIdea(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ExImages[]
+     */
+    public function getExImages(): Collection
+    {
+        return $this->exImages;
+    }
+
+    public function addExImage(ExImages $exImage): self
+    {
+        if (!$this->exImages->contains($exImage)) {
+            $this->exImages[] = $exImage;
+            $exImage->setIdea($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExImage(ExImages $exImage): self
+    {
+        if ($this->exImages->contains($exImage)) {
+            $this->exImages->removeElement($exImage);
+            // set the owning side to null (unless already changed)
+            if ($exImage->getIdea() === $this) {
+                $exImage->setIdea(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ExUrl[]
+     */
+    public function getExUrls(): Collection
+    {
+        return $this->exUrls;
+    }
+
+    public function addExUrl(ExUrl $exUrl): self
+    {
+        if (!$this->exUrls->contains($exUrl)) {
+            $this->exUrls[] = $exUrl;
+            $exUrl->setIdea($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExUrl(ExUrl $exUrl): self
+    {
+        if ($this->exUrls->contains($exUrl)) {
+            $this->exUrls->removeElement($exUrl);
+            // set the owning side to null (unless already changed)
+            if ($exUrl->getIdea() === $this) {
+                $exUrl->setIdea(null);
+            }
+        }
 
         return $this;
     }
