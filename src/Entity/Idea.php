@@ -78,17 +78,17 @@ class Idea
     private $user;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\ExCompany", mappedBy="idea", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\ExCompany", mappedBy="idea", orphanRemoval=true, cascade={"persist"})
      */
     private $exCompanies;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\ExImages", mappedBy="idea", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\ExImages", mappedBy="idea", orphanRemoval=true, cascade={"persist"})
      */
     private $exImages;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\ExUrl", mappedBy="idea", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\ExUrl", mappedBy="idea", orphanRemoval=true, cascade={"persist"} )
      */
     private $exUrls;
 
@@ -98,7 +98,7 @@ class Idea
     public function __construct()
     {
         $this->users = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->category = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->categories = new \Doctrine\Common\Collections\ArrayCollection();
         $this->exCompanies = new ArrayCollection();
         $this->exImages = new ArrayCollection();
         $this->exUrls = new ArrayCollection();

@@ -29,7 +29,7 @@ class ExUrl
     private $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Idea", inversedBy="exUrls")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Idea", inversedBy="exUrls", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $idea;

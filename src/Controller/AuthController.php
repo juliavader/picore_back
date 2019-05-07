@@ -40,6 +40,9 @@ class AuthController extends BaseController
         return $this->json($user);
     }
 
+    /**
+     * @Route("/api")
+     */
     public function api()
     {
         return new Response(sprintf('Logged in as %s', $this->getUser()->getUsername()));

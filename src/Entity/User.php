@@ -69,7 +69,7 @@ class User implements UserInterface
 
     /**
      * @var \Doctrine\Common\Collections\Collection
-     * @MaxDepth(1)
+     * @MaxDepth(2)
      *
      * @ORM\ManyToMany(targetEntity="Idea", inversedBy="users")
      * @ORM\JoinTable(name="favorites",
@@ -95,8 +95,8 @@ class User implements UserInterface
      */
     public function __construct()
     {
-        $this->badges = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->favoriteIdeas = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->badges = new ArrayCollection();
+        $this->favoriteIdeas = new ArrayCollection();
         $this->ideas = new ArrayCollection();
     }
 

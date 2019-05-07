@@ -3,6 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Category;
+use App\Entity\ExCompany;
+
+use App\Entity\ExImages;
+use App\Entity\ExUrl;
 use App\Entity\Idea;
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,7 +17,8 @@ class IdeaController extends BaseController
 {
 
     /**
-     * @Route("/newIdea", name="new_idea", methods="POST" )
+     * @Route("/api/newIdea", name="new_idea", methods="POST" )
+     * @param Request $request
      * @return Response
      */
 
@@ -21,22 +26,134 @@ class IdeaController extends BaseController
     {
         $em = $this->getDoctrine()->getManager();
 
+
+//        Title
         $title = $request->request->get('title');
+
+//        Description
         $description = $request->request->get('description');
-        $categoryId = $request->request->get('category');
-        $category = $em->getRepository(Category::class)->find($categoryId);
-//        $user = $request->request->get('user');
+
+
+
+//        User
+        $user = $this->getUser();
+        $credit = $user->getCredit();
+        $credit += 1 ;
+        $user->setCredit($credit);
+
 
         $newidea = new Idea();
         $newidea-> setName($title);
         $newidea->setDescription($description);
-//        $newidea->setUser($user);
+
+        $newidea->addUser($user);
+
+//        Category
+        $categoryId = $request->request->get('category');
+        if ($categoryId){
+            foreach ($categoryId as $category){
+                $category = $em->getRepository(Category::class)->find($category);
+                $newidea->addCategory($category);
+            }
+        }
+
+//        Compagnies
+        $Compagnies = $request->request->get('compagny');
+        if ($Compagnies){
+            foreach ($Compagnies as $Compagny){
+                $ExCompagnies = new ExCompany();
+                $ExCompagnies->setName($Compagny);
+                $newidea->addExCompany($ExCompagnies);
+            }
+        }
+
+//        Image
+        $Images = $request->request->get('image');
+        if ($Images){
+            foreach ($Images as $Image){
+                $ExImage = new ExImages();
+                $ExImage->setName($Image);
+                $newidea->addExImage($ExImage);
+            }
+        }
+
+        //       URL
+        $urls = $request->request->get('url');
+        if ($urls){
+            foreach ($urls as $url){
+                $exUrl = new ExUrl();
+                $exUrl->setName($url);
+                $newidea->addExUrl($exUrl);
+            }
+        }
+
         $newidea->setDateCreation(new \DateTime());
         $em->persist($newidea);
         $em->flush();
 
-        return $this->json($newidea);
+        return $this->serializeEntity($newidea);
     }
+
+
+    /**
+     * @Route("/api/removeIdea", name="remove_idea", methods="POST" )
+     * @param Request $request
+     * @return Response
+     */
+
+    public function removeIdea(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+
+//        Idea
+        $IdIdea = $request->request->get('idea');
+        $Idea = $em->getRepository(Idea::class)->find($IdIdea);
+
+
+
+//          User
+        $user = $this->getUser();
+
+
+
+        $Idea->removeUser($user);
+
+        $IdCompagnies = $request->request->get('compagny');
+        if ($IdCompagnies){
+            foreach ($IdCompagnies as $Compagny){
+                $ExCompagnies = $em->getRepository(ExCompany::class)->find($Compagny);
+                $Idea->removeExCompany($ExCompagnies);
+            }
+        }
+
+//        Image
+        $Images = $request->request->get('image');
+        if ($Images){
+            foreach ($Images as $Image){
+                $ExImage = $em->getRepository(ExImages::class)->find($Image);
+                $Idea->removeExImage($ExImage);
+            }
+        }
+
+//       URL
+        $urls = $request->request->get('url');
+        if ($urls){
+            foreach ($urls as $url){
+                $ExUrl = $em->getRepository(ExUrl::class)->find($url);
+                $Idea->addExUrl($ExUrl);
+            }
+        }
+        $em->remove($Idea);
+        $em->flush();
+
+
+        return new Response('Idea has been deleted ! ');
+    }
+
+
+
+
 
 
     /**
@@ -60,9 +177,11 @@ class IdeaController extends BaseController
     public  function getonebyRandom():Response
     {
         $idea = $this->getDoctrine()->getRepository(Idea::class)
-            ->findOneBy([ 'id' => RAND(1, $this->Counting()) ]);
+            ->findAll();
+        $shuffle = shuffle($idea);
+        $RandomIdea = array_pop($idea);
 
-        return $this->serializeEntity($idea);
+        return $this->serializeEntity($RandomIdea);
     }
 
 
@@ -74,15 +193,16 @@ class IdeaController extends BaseController
 
         public function oneSpecificIdea($categoryId):Response
         {
-            $specIdea = $this->getDoctrine()->getRepository(Idea::class)
+            $Idea = $this->getDoctrine()->getRepository(Idea::class)
                 ->createQueryBuilder('i')
                 ->select('i ,c')
                 ->join('i.categories', 'c')
                 ->where('c.id = :categoryId')
-                ->setMaxResults(1)
                 ->setParameter(':categoryId', $categoryId)
                 ->getQuery()
                 ->getScalarResult();
+            $shuffle = shuffle($Idea);
+            $specIdea = array_pop($Idea);
 
         return $this->json($specIdea);
     }
@@ -99,7 +219,7 @@ class IdeaController extends BaseController
 
     public function twoSpecificationsForIdea($categoryId, $subCategoryId):Response
     {
-        $specIdea = $this->getDoctrine()->getRepository(Idea::class)
+        $Idea = $this->getDoctrine()->getRepository(Idea::class)
             ->createQueryBuilder('i')
             ->select('i,c')
             ->join('i.categories', 'c')
@@ -109,32 +229,14 @@ class IdeaController extends BaseController
             ->setParameter(':subCategoryId',$subCategoryId)
             ->getQuery()
             ->getScalarResult();
-
+        $shuffle = shuffle($Idea);
+        $specIdea = array_pop($Idea);
         return $this->json($specIdea);
     }
 
 
-    /**
-     * @Route("/addFavorite", name="favorite", methods="POST" )
-     * @return Response
-     */
-
-    public function AddFavorite(Request $request)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        $ideaId = $request->request->get('idea');
-        $idea = $em->getRepository(Idea::class)->find($ideaId);
-        $userid = $request->request->get('user');
-        $user = $em->getRepository(User::class)->find($userid);
 
 
-        $addFavorite = $user->addFavoriteIdea($idea);
-        $em->persist($addFavorite);
-        $em->flush();
-
-        return $this->serializeEntity($addFavorite);
-    }
 
 
 

@@ -2,11 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Idea;
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use App\Controller\BaseController;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 
@@ -80,28 +82,57 @@ class UserController extends BaseController
     }
 
 
-//    /**
-//     * @Route("/new/user", name="new_user", methods="POST" )
-//     * @return Response
-//     */
-//
-//    public function NewUser(Request $request)
-//    {
-//        $data = $request->getContent();
-//        $jsonData = json_decode($data, true);
-//
-//        $em = $this->getDoctrine()->getManager();
-//        $person = new User();
-//        $person->setName($jsonData['name']);
-//        $person->setEmail($jsonData['email']);
-//        $person->setCreatedAt(new \DateTime());
-//        $person->setCredit(3);
-//        $person->setPassword($jsonData['password']);
-//        $em->persist($person);
-//        $em->flush();
-//
-//        return $this->json('you did it ! ');
-//    }
+    /**
+     * @Route("/addFavorite", name="favorite", methods="POST" )
+     * @param Request $request
+     * @return Response
+     */
+
+    public function AddFavorite(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $ideaId = $request->request->get('idea');
+        $idea = $em->getRepository(Idea::class)->find($ideaId);
+        $userid = $request->request->get('user');
+        $user = $em->getRepository(User::class)->find($userid);
+
+
+        $addFavorite = $user->addFavoriteIdea($idea);
+        $em->persist($addFavorite);
+        $em->flush();
+
+        return $this->serializeEntity($addFavorite);
+    }
+
+    /**
+     * @Route("/api/getAllFavoritesByUser", name="getAllFavoritesByUser", methods="GET" )
+     * @param Request $request
+     * @return Response
+     */
+
+    public function getAllFavoritesByUser(Request $request)
+    {
+        $getFavorites = $this->getUser()->getFavoriteIdeas();
+
+        return $this->serializeEntity($getFavorites);
+    }
+
+
+    /**
+     * @Route("/api/getAllIdeasByUser", name="getAllIdeasByUser", methods="GET" )
+     * @param Request $request
+     * @return Response
+     */
+
+    public function getAllIdeasByUser(Request $request)
+    {
+
+        $getIdeas = $this->getUser()->getIdeas();
+
+        return $this->serializeEntity($getIdeas);
+    }
+
 
 
 

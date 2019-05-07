@@ -3,10 +3,6 @@ newuser:
   controller: App\Controller\AuthController::newuser
   methods: POST
 
-api:
-  path: /api
-  controller: App\Controller\AuthController::api
-
 login_check:
   path:     /login_check
   methods:  [POST]
