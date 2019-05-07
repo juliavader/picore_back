@@ -168,33 +168,33 @@ class User implements UserInterface
 
 
 
-//    /**
-//     * @return Collection|Badges[]
-//     */
-//    public function getBadges(): Collection
-//    {
-//        return $this->badges;
-//    }
-//
-//    public function addBadge(Badges $badge): self
-//    {
-//        if (!$this->badges->contains($badge)) {
-//            $this->badges[] = $badge;
-//            $badge->addUser($this);
-//        }
-//
-//        return $this;
-//    }
-//
-//    public function removeBadge(Badges $badge): self
-//    {
-//        if ($this->badges->contains($badge)) {
-//            $this->badges->removeElement($badge);
-//            $badge->removeUser($this);
-//        }
-//
-//        return $this;
-//    }
+    /**
+     * @return Collection|Badges[]
+     */
+    public function getBadges(): Collection
+    {
+        return $this->badges;
+    }
+
+    public function addBadge(Badges $badge): self
+    {
+        if (!$this->badges->contains($badge)) {
+            $this->badges[] = $badge;
+            $badge->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBadge(Badges $badge): self
+    {
+        if ($this->badges->contains($badge)) {
+            $this->badges->removeElement($badge);
+            $badge->removeUser($this);
+        }
+
+        return $this;
+    }
 
     /**
      * @return Collection|Idea[]

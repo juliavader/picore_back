@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Badges;
 use App\Entity\Idea;
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use App\Controller\BaseController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -133,6 +133,38 @@ class UserController extends BaseController
         return $this->serializeEntity($getIdeas);
     }
 
+
+    /**
+     * @Route("/api/addBadgeToUser", name="badgeToUser", methods="POST" )
+     * @param Request $request
+     * @return Response
+     */
+
+    public function AddBadge(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $badgeId = $request->request->get('badge');
+        $badge = $em->getRepository(Badges::class)->find($badgeId);
+        $addBadge = $this->getUser()->addBadge($badge);
+        $em->persist($addBadge);
+        $em->flush();
+
+        return $this->serializeEntity($addBadge);
+    }
+
+    /**
+     * @Route("/api/getAllBadges", name="AllBadgeOfUser", methods="GET" )
+     * @param Request $request
+     * @return Response
+     */
+    public function AllBadge(Request $request)
+    {
+
+        $allBadges = $this->getUser()->getBadges();
+
+        return $this->serializeEntity($allBadges);
+    }
 
 
 

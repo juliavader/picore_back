@@ -30,6 +30,21 @@ class Badges
      */
     private $name;
 
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="description", type="text", length=65535, nullable=false)
+     */
+    private $description;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="image", type="string", length=255, nullable=false)
+     */
+    private $image;
+
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
@@ -70,30 +85,62 @@ class Badges
         return $this;
     }
 
-//    /**
-//     * @return Collection|User[]
-//     */
-//    public function getUser(): Collection
-//    {
-//        return $this->user;
-//    }
-//
-//    public function addUser(User $user): self
-//    {
-//        if (!$this->user->contains($user)) {
-//            $this->user[] = $user;
-//        }
-//
-//        return $this;
-//    }
-//
-//    public function removeUser(User $user): self
-//    {
-//        if ($this->user->contains($user)) {
-//            $this->user->removeElement($user);
-//        }
-//
-//        return $this;
-//    }
+    /**
+     * @return Collection|User[]
+     */
+    public function getUser(): Collection
+    {
+        return $this->user;
+    }
+
+    public function addUser(User $user): self
+    {
+        if (!$this->user->contains($user)) {
+            $this->user[] = $user;
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): self
+    {
+        if ($this->user->contains($user)) {
+            $this->user->removeElement($user);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImage(): string
+    {
+        return $this->image;
+    }
+
+    /**
+     * @param string $image
+     */
+    public function setImage(string $image): void
+    {
+        $this->image = $image;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription(string $description): void
+    {
+        $this->description = $description;
+    }
 
 }
